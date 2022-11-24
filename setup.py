@@ -4,7 +4,7 @@ with open('Readme.md') as f:
     txt = f.read()
 
 setup(name='kbib',
-    version='0.1.2',
+    version='0.1.3',
     description='A tool to get bibtex entries from DOIs or PDFs',
     long_description=txt,
     long_description_content_type='text/markdown',
@@ -13,7 +13,8 @@ setup(name='kbib',
     license="MIT",
     classifiers=[
         'Development Status :: 5 - Production/Stable',
-        'Environment :: Console', 'Intended Audience :: Science/Research',
+        'Environment :: Console', 
+        'Intended Audience :: Science/Research',
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
@@ -21,7 +22,7 @@ setup(name='kbib',
         'Programming Language :: Python :: 3.6',
         'Topic :: System :: Shells'
     ],
-    keywords='File Operations',
+    keywords='bibtex references doi crossref',
     project_urls={'Source Code': 'https://github.com/Koushikphy/kbib'},
     zip_safe=True,
     python_requires='>=3.6',

@@ -3,7 +3,7 @@ import argparse
 import bibtexparser
 import pkg_resources
 import requests_cache
-from rich.progress import track
+from rich.progress import *
 from datetime import timedelta
 # import urllib,json
 
@@ -13,6 +13,16 @@ __all__ = []
 version = '0.1.0'
 version= pkg_resources.require('kbib')[0].version
 
+progress = Progress(
+    TextColumn("[progress.description]{task.description}"),
+    SpinnerColumn(),
+    TimeElapsedColumn(),
+    BarColumn(),
+    MofNCompleteColumn(),
+    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+    " ETA:",
+    TimeRemainingColumn(),
+)
 
 
 session = requests_cache.CachedSession('doi_cache', 
@@ -28,7 +38,7 @@ def get_bib(doi):
     url = "{}works/{}/transform/application/x-bibtex".format(BARE_URL, doi)
     r = session.get(url)
     # r =requests.get(doi, headers={'Accept':'application/x-bibtex'})
-    found = r.status_code != 200 
+    found = r.status_code == 200 
     bib = str(r.content, "utf-8")
     return found, bib
 
@@ -51,11 +61,12 @@ def getFullRefList(doi):
             print("DOIs not found for {} references.".format(refNotFound))
         fullRef = []
         # for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
-        for ref in track(refDOIs,description='[green bold]Parsing bibtex entries from reference list...'):
- 
-            f, refVal = get_bib(ref['DOI'])
-            if f:
-                fullRef.append(refVal)
+        with progress:
+            for ref in progress.track(refDOIs,description='[green bold]Parsing bibtex entries from reference list...'):
+    
+                f, refVal = get_bib(ref['DOI'])
+                if f:
+                    fullRef.append(refVal)
         return '\n\n\n'.join(fullRef)
     else:
         raise Exception("Unable to parse reference list.")
@@ -146,6 +157,7 @@ def main():
     
     if args.bib:
         f,bib = get_bib(args.bib)
+        # print(f,bib)
         if f:
             writeBib(bib,args.o)
         else:
@@ -166,18 +178,22 @@ def main():
             # print(args.pdf)
             def getbibfrompdf(file):
                 doi = pdf2doi.pdf2doi(file)['identifier']
-                f,bib = get_bib(doi)
-                return f,bib
+                return get_bib(doi)
 
             pdfs = args.pdf
             if len(pdfs)==1:
-                writeBib(getbibfrompdf(pdfs[0]),args.o)
+                f, bib = getbibfrompdf(pdfs[0])
+                if f:
+                    writeBib(bib,args.o)
+                else:
+                    print("Unable to parse bibtex information.")
             else:
                 fullRef = []
-                for pdf in track(pdfs,description='Parsing bibtex entries from reference list'):
-                    f,bib = getbibfrompdf(pdf)
-                    if f:
-                        fullRef.append(bib)
+                with progress:
+                    for pdf in progress.track(pdfs,description='[green bold]Parsing bibtex for files...'):
+                        f,bib = getbibfrompdf(pdf)
+                        if f:
+                            fullRef.append(bib)
                 writeBib(removeDupEntries('\n\n\n'.join(fullRef)),args.o)
                 
         except ImportError:
