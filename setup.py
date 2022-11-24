@@ -28,9 +28,9 @@ setup(name='kbib',
     python_requires='>=3.6',
     packages=find_packages(),
     install_requires=[
-        'bibtexparser',
-        'rich',
-        'requests_cache'
+        'bibtexparser>=1.4.0',
+        'rich>=12.6.0',
+        'requests_cache>=0.9.7'
     ],
     extras_require = {
         'pdf': ['pdf2doi']
