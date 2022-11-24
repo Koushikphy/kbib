@@ -83,7 +83,7 @@ doi = 'https://doi.org/10.1021/acs.jpca.2c01209'
 
 version = '0.1.0'
 __all__ = []
-version= pkg_resources.require('kfutils')[0].version
+# version= pkg_resources.require('kbib')[0].version
 
 class CustomParser(argparse.ArgumentParser):
 
@@ -107,7 +107,7 @@ def createParser():
     #main parser
     parser = CustomParser(prog="kbib",
                           formatter_class=argparse.RawTextHelpFormatter,
-                          description="A tool .",
+                          description="Get all bibtex entries from DOI",
                           epilog="Version: {}\nhttps://github.com/Koushikphy/kbib\nCreated by Koushik Naskar (koushik.naskar9@gmail.com)".format(version)
                           )
 

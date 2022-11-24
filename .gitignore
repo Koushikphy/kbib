@@ -1,2 +1,6 @@
 *.bib
 test*
+build
+*egg*
+.pypirc
+dist

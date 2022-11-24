@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        ".gitignore": true,
+        "dist": true,
+        "build": true,
+        "LICENSE": true,
+        "MANIFEST.in": true,
+        "*.egg-info": true,
+    },
+}
