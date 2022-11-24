@@ -1,4 +1,4 @@
-## `kbib`: Get all bibtex entries from DOIs or PDFs.
+## `kbib`: A tool to get bibtex entries from DOIs or PDFs.
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypi.org/project/kbib/)
@@ -6,7 +6,7 @@
 [![Alt text](https://img.shields.io/pypi/status/kbib.svg)](https://pypi.org/project/kbib/)
 [![Alt text](https://github.com/koushikphy/kbib/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Koushikphy/kbib/releases/latest)
 
-### ⚒ Instalation
+### 🐱‍🏍 Installation
 Download and install the latest package from the [release section](https://github.com/Koushikphy/kbib/releases/latest) or directly by pip
 ```bash
 pip install kbib
@@ -34,15 +34,38 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-o DOI]
 
 | Argument    |  Description|
 | ----------- | ----------- 
-|    `-bib`     |DOI to get bib entry  |
-|    `-ref`     | DOI to get bib entries for all the references | 
-|    `-pdf`     | PDF file name(s) to get DOI | 
+|    `-bib`    | DOI to get bibtex entry |
+|    `-ref`    | DOI to get bibtex entries for all the references | 
+|    `-pdf`    | PDF file name(s) to get DOI | 
 |    `-o`      | Output bib file | 
 
+1. Get bibtex from a DOI
+    ```bash
+    kbib -bib https://doi.org/10xxxxxx
+    ```
+1. Get bibtex from a DOI and store in a file 'ref.bib'
+    ```bash
+    kbib -bib https://doi.org/10xxxxxx -o ref.bib
+    ```
+1. Get the full reference list of an article as bibtex entries and save as ref.bib
+    ```bash
+    kbib -ref https://doi.org/10xxxxxx -o ref.bib
+    ```
+1. Get bibtex from a PDF named article.pdf
+    ```bash
+    kbib -pdf article.pdf
+    ```
+1. Get bibtex from all pdf in the current folder
+    ```bash
+    kbib -pdf *.pdf
+    ```
 
-#### Limitation:
-Currently it parses DOI information from Crossref API (api.crossref.org). So if the article is not indexed in Crossref database this tool will fail to get the necessary information.
+
+#### ⚓Limitation:
+Currently it parses DOI information from [Crossref API](https://github.com/CrossRef/rest-api-doc). So if the article is not indexed in Crossref database this tool will fail to get the necessary information.
 
 
-#### Work-in-Progress:
-Concurrent API calls for faster parsing of bibtex information.
+#### ⚒ Work-in-Progress:
+1. Concurrent API calls for faster parsing of bibtex information.
+2. Set bibtex entry keys in a predefined format.
+3. Ise abbreviated journal names.

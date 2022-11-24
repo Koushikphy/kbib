@@ -5,7 +5,7 @@ with open('Readme.md') as f:
 
 setup(name='kbib',
     version='0.1.2',
-    description='Get all bibtex entries from DOIs or PDFs',
+    description='A tool to get bibtex entries from DOIs or PDFs',
     long_description=txt,
     long_description_content_type='text/markdown',
     author='Koushik Naskar',

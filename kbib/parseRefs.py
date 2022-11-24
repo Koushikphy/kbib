@@ -1,4 +1,3 @@
-
 import sys
 import argparse
 import bibtexparser
@@ -55,16 +54,18 @@ def getFullRefList(doi):
         for ref in track(refDOIs,description='[green bold]Parsing bibtex entries from reference list...'):
  
             f, refVal = get_bib(ref['DOI'])
- 
-            fullRef.append(refVal)
+            if f:
+                fullRef.append(refVal)
         return '\n\n\n'.join(fullRef)
+    else:
+        raise Exception("Unable to parse reference list.")
+    
 
 
 def removeDupEntries(bibs):
     bib_dat_DB = bibtexparser.loads(bibs)
     bib_dat = bib_dat_DB.entries
     idList = [i["ID"] for i in bib_dat]
-
 
     uList = set([])
 
@@ -100,7 +101,7 @@ def createParser():
     #main parser
     parser = CustomParser(prog="kbib",
                           formatter_class=argparse.RawTextHelpFormatter,
-                          description="Get all bibtex entries from DOIs or PDFs",
+                          description="A tool to get bibtex entries from DOIs or PDFs",
                           epilog="Version: {}\nhttps://github.com/Koushikphy/kbib\nCreated by Koushik Naskar (koushik.naskar9@gmail.com)".format(version)
                           )
 
@@ -120,6 +121,7 @@ def cleanDOI(doi):
 
 
 def writeBib(bibs, out):
+    # write the bibtex information in file or stdout
     if out:
         with open(out,'w') as f:
             f.write(bibs)
@@ -128,6 +130,7 @@ def writeBib(bibs, out):
 
 
 def CommandsGiven(args):
+    # check if any commands are given
     for elem in ['bib','ref','pdf']:
         if getattr(args,elem):
             return True
@@ -143,11 +146,17 @@ def main():
     
     if args.bib:
         f,bib = get_bib(args.bib)
-        writeBib(bib,args.o)
+        if f:
+            writeBib(bib,args.o)
+        else:
+            print("Unable to parse bibtex information.")
     if args.ref:
-        bib = getFullRefList(args.ref)
-        bib = removeDupEntries(bib)
-        writeBib(bib,args.o)
+        try:
+            bib = getFullRefList(args.ref)
+            bib = removeDupEntries(bib)
+            writeBib(bib,args.o)
+        except:
+            print("Unable to parse bibtex information.")
 
     if args.pdf:
         # print(args.pdf)
@@ -157,9 +166,8 @@ def main():
             # print(args.pdf)
             def getbibfrompdf(file):
                 doi = pdf2doi.pdf2doi(file)['identifier']
-                # doi = cleanDOI(doi)
                 f,bib = get_bib(doi)
-                return bib
+                return f,bib
 
             pdfs = args.pdf
             if len(pdfs)==1:
@@ -167,12 +175,16 @@ def main():
             else:
                 fullRef = []
                 for pdf in track(pdfs,description='Parsing bibtex entries from reference list'):
-                    fullRef.append(getbibfrompdf(pdf))
+                    f,bib = getbibfrompdf(pdf)
+                    if f:
+                        fullRef.append(bib)
                 writeBib(removeDupEntries('\n\n\n'.join(fullRef)),args.o)
                 
         except ImportError:
-            print('''Feature not available. Install the optional feature with `pip install kbib['pdf']`''')
+            print('''Feature not available. Install the optional feature with `pip install kbib["pdf"]`''')
 
+        except:
+            print("Unable to parse bibtex information.")
 
 
 
