@@ -1,8 +1,9 @@
 import requests, urllib,json,bibtexparser,sys,argparse,pkg_resources
 from tqdm import tqdm
 
-BARE_URL = "http://api.crossref.org/"
 
+
+BARE_URL = "http://api.crossref.org/"
 
 
 
@@ -35,7 +36,7 @@ def getFullRefList(doi):
             print("DOIs not found for {} references.".format(refNotFound))
         # print("Parsing bibtex entries for reference list. Please wait...")
         fullRef = []
-        for ref in tqdm(refDOIs,desc='Parsing bibtex entries for reference list'):
+        for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
  
             f, refVal = get_bib(ref['DOI'])
  
@@ -74,8 +75,6 @@ def removeDupEntries(bibs):
 
 
 
-doi = 'https://doi.org/10.1021/acs.jpca.2c01209'
-
 
 
 
@@ -113,14 +112,17 @@ def createParser():
 
     #adding options for numerical jobs
     parser.add_argument('-bib', type=str, help="Provide DOI to get bib entry", metavar="DOI")
-    parser.add_argument('-ref', type=str, help="Provide DOI to get bib entries for all the references ", metavar="DOI")
+    parser.add_argument('-ref', type=str, help="Provide DOI to get bib entries for all the references", metavar="DOI")
+    parser.add_argument('-pdf', type=str, help="Provide pdf file name to get DOI", metavar="DOI")
     parser.add_argument('-o', type=str, help="Output bib file", metavar="DOI")
 
     return parser.parse_args()
 
 
 def cleanDOI(doi):
-    pass
+    if 'https://doi.org/' not in doi:
+        doi = 'https://doi.org/{}'.format(doi)
+    return doi
 
 
 def writeBib(bibs, out):
@@ -142,7 +144,18 @@ def main():
         bib = removeDupEntries(bib)
         writeBib(bib,args.o)
 
+    if args.pdf:
+        try:
+            import pdf2doi
+            pdf2doi.config.set('verbose',False)
+            # print(args.pdf)
+            doi = pdf2doi.pdf2doi(args.pdf)['identifier']
+            # doi = cleanDOI(doi)
+            f,bib = get_bib(doi)
+            writeBib(bib,args.o)
 
+        except ImportError:
+            print('''Feature not available. Install the optional feature with `pip install kbib['pdf']`''')
 
 
 

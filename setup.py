@@ -26,6 +26,13 @@ setup(name='kbib',
     zip_safe=True,
     python_requires='>=3.6',
     packages=find_packages(),
+    install_requires=[
+        'bibtexparser',
+        'tqdm'
+    ],
+    extras_require = {
+        'pdf': ['pdf2doi']
+    },
     entry_points={
         'console_scripts': [
             'kbib = kbib.parseRefs:main',

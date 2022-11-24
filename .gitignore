@@ -1,4 +1,5 @@
 *.bib
+*.pdf
 test*
 build
 *egg*
