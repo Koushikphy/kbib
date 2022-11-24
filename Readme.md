@@ -1,4 +1,4 @@
-## `kbib`: A tool for common data file operations.
+## `kbib`: Get all bibtex entries from DOIs or PDFs.
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypi.org/project/kbib/)
@@ -11,7 +11,12 @@ Download and install the latest package from the [release section](https://githu
 ```bash
 pip install kbib
 ```
-This installs the python module and a command line tool named `kbib`.  
+For paring bibtex information from PDF files, optional dependencies need to be installed
+
+```bash
+pip install kbib['pdf']
+```
+
 
 
 ### ⚡ Features
@@ -29,8 +34,15 @@ kbib [-h] [-bib DOI] [-ref DOI] [-o DOI]
 
 | Argument    |  Description|
 | ----------- | ----------- 
-|    `-bib`     | Provide DOI to get bib entry |
-|    `-ref`     |  Provide DOI to get bib entries for all the references | 
-|    `-o`     | Output bib file | 
+|    `-bib`     |DOI to get bib entry  |
+|    `-ref`     | DOI to get bib entries for all the references | 
+|    `-pdf`     | PDF file name(s) to get DOI | 
+|    `-o`      | Output bib file | 
 
 
+#### Limitation:
+Currently it parses DOI information from Crossref API (api.crossref.org). So if the article is not indexed in Crossref database this tool will fail to get the necessary information.
+
+
+#### Work-in-Progress:
+Concurrent API calls for faster parsing of bibtex information.
