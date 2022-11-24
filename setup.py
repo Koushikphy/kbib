@@ -4,7 +4,7 @@ with open('Readme.md') as f:
     txt = f.read()
 
 setup(name='kbib',
-    version='0.1.1',
+    version='0.1.2',
     description='Get all bibtex entries from DOIs or PDFs',
     long_description=txt,
     long_description_content_type='text/markdown',
@@ -28,7 +28,8 @@ setup(name='kbib',
     packages=find_packages(),
     install_requires=[
         'bibtexparser',
-        'tqdm'
+        'rich',
+        'requests_cache'
     ],
     extras_require = {
         'pdf': ['pdf2doi']

@@ -29,7 +29,7 @@ pip install kbib['pdf']
 ### 🚀 Usage 
 Use the command line tool `kbib` as 
 ```bash
-kbib [-h] [-bib DOI] [-ref DOI] [-o DOI]
+kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-o DOI]
 ```
 
 | Argument    |  Description|

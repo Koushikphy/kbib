@@ -1,16 +1,33 @@
-import requests, urllib,json,bibtexparser,sys,argparse,pkg_resources
-from tqdm import tqdm
 
-
+import sys
+import argparse
+import bibtexparser
+import pkg_resources
+import requests_cache
+from rich.progress import track
+from datetime import timedelta
+# import urllib,json
 
 BARE_URL = "http://api.crossref.org/"
 
+__all__ = []
+version = '0.1.0'
+version= pkg_resources.require('kbib')[0].version
+
+
+
+session = requests_cache.CachedSession('doi_cache', 
+    use_cache_dir=True,                # Save files in the default user cache dir
+    cache_control=True,                # Use Cache-Control response headers for expiration, if available
+    expire_after=timedelta(days=30),    # Otherwise expire responses after one day
+    allowable_codes=[200, 400], 
+)
 
 
 def get_bib(doi):
     # handle situation when not successful
     url = "{}works/{}/transform/application/x-bibtex".format(BARE_URL, doi)
-    r = requests.get(url)
+    r = session.get(url)
     # r =requests.get(doi, headers={'Accept':'application/x-bibtex'})
     found = r.status_code != 200 
     bib = str(r.content, "utf-8")
@@ -19,12 +36,11 @@ def get_bib(doi):
 
 def get_all_ref(doi):
     url = "{}works/{}".format(BARE_URL, doi)
-    r = requests.get(url)
+    r = session.get(url)
     found = r.status_code == 200
     item = r.json()
     # item["message"]["short-container-title"] #abbreviated journal name
     return found, item["message"]["reference"]
-
 
 
 def getFullRefList(doi):
@@ -34,16 +50,14 @@ def getFullRefList(doi):
         refNotFound = len(tRefs) - len(refDOIs)
         if refNotFound:
             print("DOIs not found for {} references.".format(refNotFound))
-        # print("Parsing bibtex entries for reference list. Please wait...")
         fullRef = []
-        for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
+        # for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
+        for ref in track(refDOIs,description='[green bold]Parsing bibtex entries from reference list...'):
  
             f, refVal = get_bib(ref['DOI'])
  
             fullRef.append(refVal)
         return '\n\n\n'.join(fullRef)
-
-
 
 
 def removeDupEntries(bibs):
@@ -74,32 +88,12 @@ def removeDupEntries(bibs):
 
 
 
-
-
-
-
-
-
-version = '0.1.0'
-__all__ = []
-version= pkg_resources.require('kbib')[0].version
-
 class CustomParser(argparse.ArgumentParser):
 
     def error(self, message):
         sys.stderr.write('\033[91mError: %s\n\033[0m' % message)
         self.print_help()
         sys.exit(2)
-
-
-def listOfInts(val):
-    try:
-        val = int(val)
-        if val < 0:
-            raise ValueError
-    except:
-        raise argparse.ArgumentTypeError("Only list of positive are allowed")
-    return val
 
 
 def createParser():
@@ -116,7 +110,7 @@ def createParser():
     parser.add_argument('-pdf', type=str, help="PDF file name(s) to get DOI", metavar="PDF", nargs='*')
     parser.add_argument('-o', type=str, help="Output bib file", metavar="DOI")
 
-    return parser.parse_args()
+    return parser
 
 
 def cleanDOI(doi):
@@ -133,8 +127,19 @@ def writeBib(bibs, out):
         print(bibs)
 
 
+def CommandsGiven(args):
+    for elem in ['bib','ref','pdf']:
+        if getattr(args,elem):
+            return True
+    return False
+
+
 def main():
-    args = createParser()
+    parser = createParser()
+    args = parser.parse_args()
+
+    if not CommandsGiven(args):
+        parser.print_help()
     
     if args.bib:
         f,bib = get_bib(args.bib)
@@ -158,14 +163,13 @@ def main():
 
             pdfs = args.pdf
             if len(pdfs)==1:
-                writeBib(getbibfrompdf(pdfs[0]))
+                writeBib(getbibfrompdf(pdfs[0]),args.o)
             else:
                 fullRef = []
-                for pdf in tqdm(pdfs,desc='Parsing bibtex entries from reference list'):
+                for pdf in track(pdfs,description='Parsing bibtex entries from reference list'):
                     fullRef.append(getbibfrompdf(pdf))
                 writeBib(removeDupEntries('\n\n\n'.join(fullRef)),args.o)
                 
-
         except ImportError:
             print('''Feature not available. Install the optional feature with `pip install kbib['pdf']`''')
 
