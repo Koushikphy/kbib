@@ -29,7 +29,7 @@ pip install kbib['pdf']
 ### 🚀 Usage 
 Use the command line tool `kbib` as 
 ```bash
-kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-o DOI]
+kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-o DOI]
 ```
 
 | Argument    |  Description|
@@ -37,6 +37,7 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-o DOI]
 |    `-bib`    | DOI to get bibtex entry |
 |    `-ref`    | DOI to get bibtex entries for all the references | 
 |    `-pdf`    | PDF file name(s) to get DOI | 
+|    `-ren`    | PDF file name(s) to rename | 
 |    `-o`      | Output bib file | 
 
 * Get bibtex from a DOI
@@ -59,12 +60,18 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-o DOI]
     ```bash
     kbib -pdf *.pdf
     ```
-
+* Rename pdf files with bibtex information
+    ```bash
+    kbib -ren article.pdf
+    # or
+    kbib -ren *.pdf
+    ```
 
 #### ⚓Limitation:
-Currently it parses DOI information from [Crossref API](https://github.com/CrossRef/rest-api-doc). So if the article is not indexed in Crossref database this tool will fail to get the necessary information. Also the API may temporarily block requests from an IP if a large number of queries are made within a short period of time.
+- `kbib` parses DOI information from [Crossref API](https://github.com/CrossRef/rest-api-doc). So if the article is not indexed in Crossref database this tool will fail to get the necessary information. Also the API may temporarily block requests from an IP if a large number of queries are made within a short period of time.
+- For bibtex keys and renaming files, `kbib` uses format as `<Short Journal Name>_<Volume>_<Year>_<Last name of first author>`, which is presently hardcoded in the tool. Therefore, one can not use any desired format through the command line.
+
 
 #### ⏳ Work-in-Progress:
-1. Concurrent API calls for faster parsing of bibtex information.
-2. Set bibtex entry keys in a predefined format.
-3. Use abbreviated journal names.
+- Concurrent API calls for faster parsing of bibtex information.
+
