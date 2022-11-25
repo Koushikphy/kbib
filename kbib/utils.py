@@ -13,9 +13,9 @@ from rich.progress import (
     BarColumn,
     MofNCompleteColumn
 )
-from argparse import ArgumentParser, RawTextHelpFormatter
 from datetime import timedelta
-
+from argparse import ArgumentParser, RawTextHelpFormatter
+from rich.console import Console
 
 try:
     import pdf2doi
@@ -29,7 +29,8 @@ except ImportError:
 class CustomParser(ArgumentParser):
 
     def error(self, message):
-        sys.stderr.write('\033[91mError: %s\n\033[0m' % message)
+        cs = Console(stderr=True)
+        cs.print(f"Error: {message}",style="red")
         self.print_help()
         sys.exit(2)
 
@@ -97,6 +98,7 @@ def get_j_abbreviation(journal):
 
 def shortenJrn(txt):
     # Short journal name to use as key or file name
+    # short journal name is made by taking first letter of each word
     txt = txt.replace('.','')
     xt = [w[0] for w in txt.split()]
     return ''.join(xt)

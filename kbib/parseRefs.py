@@ -21,7 +21,7 @@ def createParser():
     #main parser
     parser = CustomParser(prog="kbib",
         formatter_class=RawTextHelpFormatter,
-        description="A tool to get bibtex entries from DOIs or PDFs",
+        description="A command line tool to get bibtex entries from DOIs or PDFs",
         epilog="Version: {}\nhttps://github.com/Koushikphy/kbib\nCreated by Koushik Naskar (koushik.naskar9@gmail.com)".format(version)
     )
 

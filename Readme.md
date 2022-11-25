@@ -1,4 +1,4 @@
-## `kbib`: A tool to get bibtex entries from DOIs or PDFs.
+## `kbib`: A command line tool to get bibtex entries from DOIs or PDFs.
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypistats.org/packages/kbib)
@@ -10,9 +10,9 @@
 
 ### ⚡ Features
 1. Get bibtex entry from DOI.
-3. Get bibtex entry from article pdf.
-2. Get full list of references of an article as bibtex entries.
-
+2. Get bibtex entry from article pdf.
+3. Get full list of references of an article as bibtex entries.
+4. Directly rename pdf files with bibtex information .
 
 ### 🛠️ Installation
 Download and install the latest package from the [release section](https://github.com/Koushikphy/kbib/releases/latest) or directly by pip
