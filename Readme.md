@@ -1,7 +1,7 @@
 ## `kbib`: A tool to get bibtex entries from DOIs or PDFs.
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
-[![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypi.org/project/kbib/)
+[![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypistats.org/packages/kbib)
 [![Alt text](https://img.shields.io/pypi/l/kbib.svg)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/status/kbib.svg)](https://pypi.org/project/kbib/)
 [![Alt text](https://github.com/koushikphy/kbib/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Koushikphy/kbib/releases/latest)
@@ -14,7 +14,7 @@
 2. Get full list of references of an article as bibtex entries.
 
 
-### 🐱‍🏍 Installation
+### 🛠️ Installation
 Download and install the latest package from the [release section](https://github.com/Koushikphy/kbib/releases/latest) or directly by pip
 ```bash
 pip install kbib
@@ -64,7 +64,7 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-o DOI]
 #### ⚓Limitation:
 Currently it parses DOI information from [Crossref API](https://github.com/CrossRef/rest-api-doc). So if the article is not indexed in Crossref database this tool will fail to get the necessary information. Also the API may temporarily block requests from an IP if a large number of queries are made within a short period of time.
 
-#### ⚒ Work-in-Progress:
+#### ⏳ Work-in-Progress:
 1. Concurrent API calls for faster parsing of bibtex information.
 2. Set bibtex entry keys in a predefined format.
 3. Use abbreviated journal names.
