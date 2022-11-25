@@ -6,3 +6,4 @@ build
 .pypirc
 dist
 *.sqlite
+__pycache__

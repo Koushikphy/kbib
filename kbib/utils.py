@@ -116,17 +116,21 @@ def get_first_author_title(txt):
 
 def manage(inp):
     # configure bibtex information parsed from the Crossref API
-    jrnl = get_j_abbreviation(inp['journal']) 
-    ath = get_first_author_title(inp['author'])
-    vol = inp['volume']
-    year = inp['year']
-    s_jrnl = shortenJrn(jrnl)
+    try:
+        jrnl = get_j_abbreviation(inp['journal']) 
+        ath = get_first_author_title(inp['author'])
+        vol = inp['volume']
+        year = inp['year']
+        s_jrnl = shortenJrn(jrnl)
 
-    inp['journal'] = jrnl
-    # bibtex entry key as <Short Journal name>_<Vol>_<Year>_<Last name of first author>
-    # modify this to use your own style of key
-    inp["ID"] = f"{s_jrnl}_{vol}_{year}_{ath}"
-    return inp
+        inp['journal'] = jrnl
+        # bibtex entry key as <Short Journal name>_<Vol>_<Year>_<Last name of first author>
+        # modify this to use your own style of key
+        inp["ID"] = f"{s_jrnl}_{vol}_{year}_{ath}"
+    except KeyError as e:
+        print(f"Key {e} not found for doi: {inp['doi']}")
+    finally:
+        return inp
     
 
 

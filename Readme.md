@@ -1,4 +1,4 @@
-## `kbib`: A command line tool to get bibtex entries from DOIs or PDFs.
+## `kbib`: A command line tool to get bibtex information from DOIs and PDFs.
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypistats.org/packages/kbib)
@@ -9,10 +9,10 @@
 
 
 ### ⚡ Features
-1. Get bibtex entry from DOI.
-2. Get bibtex entry from article pdf.
-3. Get full list of references of an article as bibtex entries.
-4. Directly rename pdf files with bibtex information .
+1. Get bibtex information from DOI.
+2. Get bibtex information from article pdf.
+3. Get full list of references of an article as a .bib file.
+4. Directly rename pdf files with bibtex information.
 
 ### 🛠️ Installation
 Download and install the latest package from the [release section](https://github.com/Koushikphy/kbib/releases/latest) or directly by pip
@@ -36,8 +36,8 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
 | ----------- | ----------- 
 |    `-bib`    | DOI to get bibtex entry |
 |    `-ref`    | DOI to get bibtex entries for all the references | 
-|    `-pdf`    | PDF file name(s) to get DOI | 
-|    `-ren`    | PDF file name(s) to rename | 
+|    `-pdf`    | PDF file name(s) to get bibtex info | 
+|    `-ren`    | PDF file name(s) to rename with bibtex info | 
 |    `-o`      | Output bib file | 
 
 * Get bibtex from a DOI
@@ -56,7 +56,7 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
     ```bash
     kbib -pdf article.pdf
     ```
-* Get bibtex from all pdf in the current folder
+* Get bibtex from all pdfs in the current folder
     ```bash
     kbib -pdf *.pdf
     ```
@@ -73,5 +73,5 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
 
 
 #### ⏳ Work-in-Progress:
-- Concurrent API calls for faster parsing of bibtex information.
+- Concurrent/Parallel API calls for faster parsing of bibtex information.
 

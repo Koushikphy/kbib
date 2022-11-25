@@ -11,6 +11,7 @@ from kbib.utils import (
 
 
 __all__ = []
+# version = '0.1.1'
 version= pkg_resources.require('kbib')[0].version
 
 
@@ -21,16 +22,16 @@ def createParser():
     #main parser
     parser = CustomParser(prog="kbib",
         formatter_class=RawTextHelpFormatter,
-        description="A command line tool to get bibtex entries from DOIs or PDFs",
+        description="A command line tool to get bibtex information from DOIs and PDFs",
         epilog="Version: {}\nhttps://github.com/Koushikphy/kbib\nCreated by Koushik Naskar (koushik.naskar9@gmail.com)".format(version)
     )
 
     #adding options for numerical jobs
-    parser.add_argument('-bib', type=str, help="DOI to get bib entry", metavar="DOI")
-    parser.add_argument('-ref', type=str, help="DOI to get bib entries for all the references", metavar="DOI")
-    parser.add_argument('-pdf', type=str, help="PDF file name(s) to get DOI", metavar="PDF", nargs='*')
-    parser.add_argument('-ren', type=str, help="PDF file name(s) to rename", metavar="PDF", nargs='*')
-    parser.add_argument('-o', type=str, help="Output bib file", metavar="DOI")
+    parser.add_argument('-bib', type=str, help="DOI to get bibtex entry", metavar="DOI")
+    parser.add_argument('-ref', type=str, help="DOI to get bibtex entries for all the references", metavar="DOI")
+    parser.add_argument('-pdf', type=str, help="PDF file name(s) to get bibtex info", metavar="PDF", nargs='*')
+    parser.add_argument('-ren', type=str, help="PDF file name(s) to rename with bibtex info", metavar="PDF", nargs='*')
+    parser.add_argument('-o',   type=str, help="Output bib file", metavar="FILE")
 
     return parser
 
@@ -86,6 +87,7 @@ def main():
 
     except:
         print("Unable to parse bibtex information.")
+        # raise
 
 
 if __name__ == "__main__":
