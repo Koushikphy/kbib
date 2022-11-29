@@ -38,6 +38,8 @@ class CustomParser(ArgumentParser):
 
 BARE_API = "http://api.crossref.org/"   # API to get bibtex information 
 ABVR_API = "https://abbreviso.toolforge.org/abbreviso/a/"  # API to get abbreviated journal name
+DOI_API  = 'https://doi.org/'
+
 
 progress = Progress(
     TextColumn("[progress.description]{task.description}"),
@@ -61,14 +63,18 @@ session = requests_cache.CachedSession('doi_cache',
 
 
 
+def cleanDOI(doi):
+    return doi if DOI_API in doi else f'{DOI_API}/{doi}'
 
 
 
 def get_bib(doi):
     # Get bibtex information from Crossref APi
-    url = "{}works/{}/transform/application/x-bibtex".format(BARE_API, doi)
-    r = session.get(url)
-    # r =requests.get(doi, headers={'Accept':'application/x-bibtex'})
+
+    # cDoi = cleanDOI(doi)
+    # r = session.get(cDoi, headers={'Accept':'application/x-bibtex'})
+    # r = session.get(cDoi, headers={'Accept':'text/x-bibliography; style=bibtex'})
+    r = session.get(f"{BARE_API}works/{doi}/transform/application/x-bibtex")
     found = r.status_code == 200 
     bib = str(r.content, "utf-8")
     return found, bib
@@ -76,8 +82,7 @@ def get_bib(doi):
 
 def get_all_ref(doi):
     # Get list of references from Crossref API
-    url = "{}works/{}".format(BARE_API, doi)
-    r = session.get(url)
+    r = session.get(f"{BARE_API}works/{doi}")
     found = r.status_code == 200
     item = r.json()
     # item["message"]["short-container-title"] #abbreviated journal name
@@ -90,7 +95,7 @@ def get_j_abbreviation(journal):
     if res.status_code ==200:
         return res.text
     else:
-        print("Unable to find abbreviated journal name for "+journal)
+        print("Unable to find abbreviated journal name for "+journal,file=sys.stderr)
         return journal
 
 
@@ -128,7 +133,7 @@ def manage(inp):
         # modify this to use your own style of key
         inp["ID"] = f"{s_jrnl}_{vol}_{year}_{ath}"
     except KeyError as e:
-        print(f"Key {e} not found for doi: {inp['doi']}")
+        print(f"Key {e} not found for doi: {inp['doi']}",file=sys.stderr)
     finally:
         return inp
     
@@ -138,6 +143,7 @@ def reconfigureBibs(bibs):
     # manage and configure all bibtex entries 
     bib_db = bibtexparser.loads(bibs)
     bib_res = [manage(elem) for elem in bib_db.entries]
+    #! handle duplicate journal name
     bib_db.entries = bib_res
     return bibtexparser.dumps(bib_db)
     
@@ -221,11 +227,6 @@ def renamePDF(files):
 
 
 
-
-# def cleanDOI(doi):
-#     if 'https://doi.org/' not in doi:
-#         doi = 'https://doi.org/{}'.format(doi)
-#     return doi
 
 
 

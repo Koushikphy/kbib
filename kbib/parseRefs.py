@@ -43,6 +43,7 @@ def writeBib(bibs, out):
     # write the bibtex information in file or stdout
     if out:
         with open(out,'w') as f:
+            f.write(r"%commant{This file was created by kbib (https://github.com/Koushikphy/kbib)}")
             f.write(bibs)
     else:
         print(bibs)
