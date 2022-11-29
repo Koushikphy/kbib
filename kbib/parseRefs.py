@@ -44,6 +44,7 @@ def writeBib(bibs, out):
     if out:
         with open(out,'w') as f:
             f.write(r"%commant{This file was created by kbib (https://github.com/Koushikphy/kbib)}")
+            f.write("\n\n\n")
             f.write(bibs)
     else:
         print(bibs)

@@ -109,13 +109,17 @@ def shortenJrn(txt):
     return ''.join(xt)
 
 
+def cleanText(txt):
+    return  rx.sub('',txt)
+
+
 rx = re.compile(r'\W+')
 def get_first_author_title(txt):
     # get last name of the first author to use as key or file name
     # may remove non-english character
     fst = txt.split(' and ')[0]
     tc= fst.strip().split(' ')[-1]
-    return rx.sub('',tc)
+    return cleanText(tc)
 
 
 
@@ -132,6 +136,7 @@ def manage(inp):
         # bibtex entry key as <Short Journal name>_<Vol>_<Year>_<Last name of first author>
         # modify this to use your own style of key
         inp["ID"] = f"{s_jrnl}_{vol}_{year}_{ath}"
+        # inp["ID"] = f"{ath}{year}_{s_jrnl}_{vol}" # second type
     except KeyError as e:
         print(f"Key {e} not found for doi: {inp['doi']}",file=sys.stderr)
     finally:
@@ -143,7 +148,21 @@ def reconfigureBibs(bibs):
     # manage and configure all bibtex entries 
     bib_db = bibtexparser.loads(bibs)
     bib_res = [manage(elem) for elem in bib_db.entries]
-    #! handle duplicate journal name
+    bibKeys = set()
+    for i,r in enumerate(bib_res):
+        key = r["ID"]
+        if key not in bibKeys:
+            bibKeys.add(r['ID'])
+        else:
+            try: # check if page number is available
+                kTmp = r['pages'].split('--')[0]
+
+            except KeyError:
+                # take first five letter of the title
+                kTmp = cleanText(r['title'])[:5].replace(' ','')
+            newKey = f"{key}_{kTmp}"
+            bib_res[i]["ID"] = newKey
+        
     bib_db.entries = bib_res
     return bibtexparser.dumps(bib_db)
     
@@ -228,69 +247,23 @@ def renamePDF(files):
 
 
 
+# progress = Progress()
+
+# progress.start()
+# task = progress.add_task("Getting references-------------",total=124)
+
+# async def get(url, session):
+#     async with session.get(url=url) as response:
+#         resp = await response.read()
+#         progress.update(task,advance=1)
+#         return resp
+
+# async def main(urls):
+#     connector = aiohttp.TCPConnector(limit=5)
+#     async with aiohttp.ClientSession(trust_env=True,connector=connector) as session:
+#         ret = await asyncio.gather(*[get(url, session) for url in urls])
+#     print(ret)
 
 
-# def removeDupEntries(bibs):
-#     bib_dat_DB = bibtexparser.loads(bibs)
-#     bib_dat = bib_dat_DB.entries
-#     idList = [i["ID"] for i in bib_dat]
-
-#     uList = set([])
-
-#     for i,key in enumerate(idList):
-#         if key in uList:
-#             index = 1
-#             while True:
-#                 newKey = key + "_" + str(index)
-#                 if newKey not in uList:
-#                     bib_dat[i]['ID'] = newKey
-#                     uList.add(newKey)
-#                     break
-#                 else:
-#                     index +=1
-#             pass 
-#         uList.add(key)
-
-
-#     bib_dat_DB.entries = bib_dat
-#     return bibtexparser.dumps(bib_dat_DB) 
-
-
-
-# import grequests  # import it to the top
-# class ProgressSession():
-#     def __init__(self, urls):
-#         self.progress = Progress()
-#         self.task = self.progress.add_task("[green]Processing...", total=len(urls))
-#         self.urls = urls
-#         self.progress.start()
-#     def update(self, r, *args, **kwargs):
-#         if not r.is_redirect:
-#             self.progress.advance(self.task)
-#     def __enter__(self):
-#         sess = grequests.Session()
-#         sess.hooks['response'].append(self.update)
-#         return sess
-#     def __exit__(self, *args):
-#         self.progress.stop()
-
-
-
-# for i in range(n)
-#     tmpL = ll[i*10:(i+1)*1]
-#     gres = grequests.map((grequests.get(i) for i in tmpL))
-#     for i in gres:
-#         print(i.status_code)
-
-
-
-# def get_urls_async(urls):
-#     res = []
-#     with ProgressSession(urls) as sess:
-#         for i in range(13):
-#             tmpL = ll[i*10:(i+1)*10]
-#             # print(tmpL)
-#             gres = grequests.map((grequests.get(url, session=sess, timeout = 5) for url in tmpL))
-#             res.extend(gres)
-#         return res
-# get_urls_async(ll)
+# asyncio.run(main(dois))
+# progress.stop()
