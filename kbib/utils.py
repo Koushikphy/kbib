@@ -13,10 +13,9 @@ from rich.progress import (
     BarColumn,
     MofNCompleteColumn
 )
-from datetime import timedelta
 from argparse import ArgumentParser, RawTextHelpFormatter
-from rich.console import Console
-
+from datetime import timedelta
+from rich import print as rprint
 try:
     import pdf2doi
     PDF_AVAILABLE = True
@@ -29,8 +28,7 @@ except ImportError:
 class CustomParser(ArgumentParser):
 
     def error(self, message):
-        cs = Console(stderr=True)
-        cs.print(f"Error: {message}",style="red")
+        rprint(f"[red]Error: {message}")
         self.print_help()
         sys.exit(2)
 
@@ -39,7 +37,6 @@ class CustomParser(ArgumentParser):
 BARE_API = "http://api.crossref.org/"   # API to get bibtex information 
 ABVR_API = "https://abbreviso.toolforge.org/abbreviso/a/"  # API to get abbreviated journal name
 DOI_API  = 'https://doi.org/'
-
 
 progress = Progress(
     TextColumn("[progress.description]{task.description}"),
@@ -60,11 +57,31 @@ session = requests_cache.CachedSession('doi_cache',
     allowable_codes=[200, 400], 
 )
 
+# regular expression rules
+rx    = re.compile(r'\W+')
+r_sub = re.compile(r'\$\\less\$sub\$\\greater\$(.*?)\$\\less\$/sub\$\\greater\$')
+r_sup = re.compile(r'\$\\less\$sup\$\\greater\$(.*?)\$\\less\$/sup\$\\greater\$')
+r_it  = re.compile(r'\$\\less\$i\$\\greater\$(.*?)\$\\less\$/i\$\\greater\$')
+r_m   = re.compile(r'\$\\mathplus\$')
+r_n   = re.compile(r'\n')
 
 
 
 def cleanDOI(doi):
     return doi if DOI_API in doi else f'{DOI_API}/{doi}'
+
+def cleanText(txt):
+    return rx.sub('',txt)
+
+
+def cleanTitle(txt):
+    ss = r_sub.sub(r"$_{\1}$",txt)
+    ss = r_sup.sub(r"$^{\1}$",ss)
+    ss = r_it.sub(r"\\emph{\1}",ss)
+    ss = r_m.sub("+",ss)
+    ss = r_n.sub(" ",ss)
+    return ss
+
 
 
 
@@ -73,8 +90,10 @@ def get_bib(doi):
 
     # cDoi = cleanDOI(doi)
     # r = session.get(cDoi, headers={'Accept':'application/x-bibtex'})
-    # r = session.get(cDoi, headers={'Accept':'text/x-bibliography; style=bibtex'})
-    r = session.get(f"{BARE_API}works/{doi}/transform/application/x-bibtex")
+    # returns in unicode format but slow
+    # r = session.get(cDoi, headers={'Accept':'text/x-bibliography; style=bibtex'})  
+    # fast but title is messed up during unicode/xml to string conversion
+    r = session.get(f"{BARE_API}works/{doi}/transform/application/x-bibtex")  
     found = r.status_code == 200 
     bib = str(r.content, "utf-8")
     return found, bib
@@ -82,7 +101,8 @@ def get_bib(doi):
 
 def get_all_ref(doi):
     # Get list of references from Crossref API
-    r = session.get(f"{BARE_API}works/{doi}")
+    url = "{}works/{}".format(BARE_API, doi)
+    r = session.get(url)
     found = r.status_code == 200
     item = r.json()
     # item["message"]["short-container-title"] #abbreviated journal name
@@ -90,30 +110,24 @@ def get_all_ref(doi):
 
 
 def get_j_abbreviation(journal):
-    # Get abbreviated journal name
+    # Get abreviated journal name
     res = session.get(ABVR_API+quote(journal))
     if res.status_code ==200:
         return res.text
     else:
-        print("Unable to find abbreviated journal name for "+journal,file=sys.stderr)
+        print("Unable to find abbreviated journal name for "+journal)
         return journal
-
 
 
 
 def shortenJrn(txt):
     # Short journal name to use as key or file name
-    # short journal name is made by taking first letter of each word
     txt = txt.replace('.','')
     xt = [w[0] for w in txt.split()]
-    return ''.join(xt)
+    sn =  ''.join(xt)
+    return cleanText(sn)
 
 
-def cleanText(txt):
-    return  rx.sub('',txt)
-
-
-rx = re.compile(r'\W+')
 def get_first_author_title(txt):
     # get last name of the first author to use as key or file name
     # may remove non-english character
@@ -128,11 +142,14 @@ def manage(inp):
     try:
         jrnl = get_j_abbreviation(inp['journal']) 
         ath = get_first_author_title(inp['author'])
+        inp['journal'] = jrnl
+        # clean the tile 
+        inp["title"] = cleanTitle(inp["title"])
+
         vol = inp['volume']
         year = inp['year']
         s_jrnl = shortenJrn(jrnl)
 
-        inp['journal'] = jrnl
         # bibtex entry key as <Short Journal name>_<Vol>_<Year>_<Last name of first author>
         # modify this to use your own style of key
         inp["ID"] = f"{s_jrnl}_{vol}_{year}_{ath}"
@@ -141,27 +158,30 @@ def manage(inp):
         print(f"Key {e} not found for doi: {inp['doi']}",file=sys.stderr)
     finally:
         return inp
-    
+
+
+
 
 
 def reconfigureBibs(bibs):
     # manage and configure all bibtex entries 
     bib_db = bibtexparser.loads(bibs)
     bib_res = [manage(elem) for elem in bib_db.entries]
-    bibKeys = set()
-    for i,r in enumerate(bib_res):
-        key = r["ID"]
-        if key not in bibKeys:
-            bibKeys.add(r['ID'])
-        else:
-            try: # check if page number is available
-                kTmp = r['pages'].split('--')[0]
 
-            except KeyError:
-                # take first five letter of the title
-                kTmp = cleanText(r['title'])[:5].replace(' ','')
-            newKey = f"{key}_{kTmp}"
-            bib_res[i]["ID"] = newKey
+    # check for duplicate keys
+    if len(bib_res)>1:
+        bibKeys = set()
+        for i,r in enumerate(bib_res):
+            key = r["ID"]
+            if key not in bibKeys:
+                bibKeys.add(r['ID'])
+            else:
+                try: # check if page number is available
+                    kTmp = r['pages'].split('--')[0]
+                except KeyError:  # if page is not there then take first 5 letter of the title
+                    kTmp = cleanText(r['title'])[:5].replace(' ','')
+                newKey = f"{key}_{kTmp}"
+                bib_res[i]["ID"] = newKey
         
     bib_db.entries = bib_res
     return bibtexparser.dumps(bib_db)
@@ -173,10 +193,18 @@ def getFullRefList(doi):
     # Get bibtex information for all the references
     found, tRefs = get_all_ref(doi)
     if found:
-        refDOIs = [ref for ref in tRefs if "DOI" in ref]
-        refNotFound = len(tRefs) - len(refDOIs)
-        if refNotFound:
-            print("DOIs not found for {} reference(s).".format(refNotFound))
+        refDOIs, noDOIs = [], []
+        for r in tRefs:
+            if "DOI" in r:
+                refDOIs.append(r)
+            else:
+                noDOIs.append(r)
+
+        if len(noDOIs):
+            rprint(f"[red]DOIs not found for following {len(noDOIs)} references:")
+            for r in noDOIs:
+                print(r)
+
         fullRef = []
         # for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
         with progress:
