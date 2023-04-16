@@ -6,7 +6,8 @@ from kbib.utils import (
     reconfigureBibs,
     getFullRefList,
     pdftobib,
-    renamePDF
+    renamePDF,
+    listDuplicates
 )
 
 
@@ -31,6 +32,7 @@ def createParser():
     parser.add_argument('-ref', type=str, help="DOI to get bibtex entries for all the references", metavar="DOI")
     parser.add_argument('-pdf', type=str, help="PDF file name(s) to get bibtex info", metavar="PDF", nargs='*')
     parser.add_argument('-ren', type=str, help="PDF file name(s) to rename with bibtex info", metavar="PDF", nargs='*')
+    parser.add_argument('-dup', type=str, help="Bib file name(s) to find duplicates.", metavar="BIB", nargs='*')
     parser.add_argument('-o',   type=str, help="Output bib file", metavar="FILE")
 
     return parser
@@ -83,6 +85,9 @@ def main():
 
         if args.ren:
             renamePDF(args.ren)
+        
+        if args.dup:
+            listDuplicates(args.dup)
 
     except AssertionError as e:
         print(e)

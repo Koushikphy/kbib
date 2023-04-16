@@ -13,6 +13,7 @@
 2. Get bibtex information from article pdf.
 3. Get full list of references of an article as a .bib file.
 4. Directly rename pdf files with bibtex information.
+5. Find duplicate bib entries in bibtex files.
 
 ### 🛠️ Installation
 Download and install the latest package from the [release section](https://github.com/Koushikphy/kbib/releases/latest) or directly by pip
@@ -29,7 +30,7 @@ pip install kbib['pdf']
 ### 🚀 Usage 
 Use the command line tool `kbib` as 
 ```bash
-kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-o DOI]
+kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-dup [BIB [BIB ...]]] [-o DOI]
 ```
 
 | Argument    |  Description|
@@ -38,6 +39,7 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
 |    `-ref`    | DOI to get bibtex entries for all the references | 
 |    `-pdf`    | PDF file name(s) to get bibtex info | 
 |    `-ren`    | PDF file name(s) to rename with bibtex info | 
+|    `-dup`    | Bib file name(s) to find duplicates. | 
 |    `-o`      | Output bib file | 
 
 * Get bibtex from a DOI
@@ -65,6 +67,10 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
     kbib -ren article.pdf
     # or
     kbib -ren *.pdf
+    ```
+* Find duplicate bib entries in bibtex files.
+    ```bash
+    kbib -dup article_1.bib article_2.bib
     ```
 
 #### ⚓Limitation:

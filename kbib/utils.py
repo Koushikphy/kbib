@@ -16,6 +16,7 @@ from rich.progress import (
 from argparse import ArgumentParser, RawTextHelpFormatter
 from datetime import timedelta
 from rich import print as rprint
+from collections import Counter
 try:
     import pdf2doi
     PDF_AVAILABLE = True
@@ -273,6 +274,30 @@ def renamePDF(files):
                 os.rename(file,newName)
 
 
+
+
+def listDuplicates(bibFiles):
+    bib_db = bibtexparser.loads('\n'.join(open(f).read() for f in bibFiles))
+    entries = bib_db.entries
+
+    # decide duplicates based on year, volume and pages. Can we make it in more sophisticated way
+    test_en = [(en.get('year',''), en.get('volume',''),en.get('pages','')) for en in entries]
+
+    duplicates = []
+    for item, count in Counter(test_en).items():
+        if count>1:
+            dupTmp = []
+            for en in entries:
+                it = (en.get('year',''), en.get('volume',''),en.get('pages',''))
+                if it==item:
+                    dupTmp.append(en.get('ID'))
+            if len(dupTmp)>1:
+                duplicates.append(dupTmp)
+
+    if len(duplicates):
+        print("The following bib entries may be duplicate. Please check:")
+        for i, item in enumerate(duplicates, start=1):
+            print(f"{i}. {' '.join(item)}")
 
 
 # progress = Progress()
