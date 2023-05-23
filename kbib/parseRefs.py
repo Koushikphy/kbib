@@ -54,7 +54,7 @@ def writeBib(bibs, out):
 
 def CommandsGiven(args):
     # check if any commands are given
-    for elem in ['bib','ref','pdf','ren']:
+    for elem in ['bib','ref','pdf','ren','dup']:
         if getattr(args,elem):
             return True
     return False
