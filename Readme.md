@@ -39,9 +39,10 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
 |    `-ref`    | DOI to get bibtex entries for all the references | 
 |    `-pdf`    | PDF file name(s) to get bibtex info | 
 |    `-ren`    | PDF file name(s) to rename with bibtex info | 
-|    `-dup`    | Bib file name(s) to find duplicates. | 
+|    `-dup`    | Bib/Tex file name(s) to find duplicates. | 
 |    `-o`      | Output bib file | 
 
+#### Use cases
 * Get bibtex from a DOI
     ```bash
     kbib -bib https://doi.org/10xxxxxx
@@ -72,6 +73,14 @@ kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-
     ```bash
     kbib -dup article_1.bib article_2.bib
     ```
+
+* If a .tex file is provided, it will find the duplicates that are cited in the tex file
+    ```bash
+    kbib -dup article.tex article_1.bib article_2.bib
+    ```
+
+
+
 
 #### ⚓Limitation:
 - `kbib` parses DOI information from [Crossref API](https://github.com/CrossRef/rest-api-doc). So if the article is not indexed in Crossref database this tool will fail to get the necessary information. Also the API may temporarily block requests from an IP if a large number of queries are made within a short period of time.

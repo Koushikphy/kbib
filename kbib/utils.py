@@ -16,7 +16,7 @@ from rich.progress import (
 from argparse import ArgumentParser, RawTextHelpFormatter
 from datetime import timedelta
 from rich import print as rprint
-from collections import Counter
+from collections import Counter, defaultdict
 try:
     import pdf2doi
     PDF_AVAILABLE = True
@@ -276,28 +276,85 @@ def renamePDF(files):
 
 
 
-def listDuplicates(bibFiles):
+def getCitaionsFromTex(texFile):
+    with open(texFile) as f:
+        txt = f.read()
+    rx = re.compile(r'''(?<!\\)%.+|(\\(?:no)?citep?\{((?!\*)[^{}]+)\})''')
+
+
+    authors = [m.group(2) for m in rx.finditer(txt) if m.group(2)]
+
+    allBibs = []
+
+    for i in authors:
+        j = i.split(',')
+        j = [k.strip() for k in j]
+        allBibs.extend(j)
+
+
+    allBibs = list(set(allBibs))
+    return allBibs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def listDuplicates(files):
+    
+    bibFiles, texFiles = [], []
+
+
+    for f in files:
+        if f.endswith('.tex'):
+            texFiles.append(f)
+        elif f.endswith('.bib'):
+            bibFiles.append(f)
+        else:
+            raise Exception('Only .tex or .bib files are allowed.')
+
+    if len(texFiles)>1:
+        raise Exception("Only one .tex file is allowed.")
+
+
+    checkTex = False
+    if len(texFiles)>1:
+        raise Exception("Only one .tex file is allowed.")
+    elif len(texFiles)==1:
+        cites = getCitaionsFromTex(texFiles[0])
+        checkTex = True
+
+
+
     bib_db = bibtexparser.loads('\n'.join(open(f).read() for f in bibFiles))
     entries = bib_db.entries
 
-    # decide duplicates based on year, volume and pages. Can we make it in more sophisticated way
-    test_en = [(en.get('year',''), en.get('volume',''),en.get('pages','')) for en in entries]
+    dat = defaultdict(list)
+    # duplication will be decided based only on these keys
+    keysToMatch = ['year','volume','pages']  
 
-    duplicates = []
-    for item, count in Counter(test_en).items():
-        if count>1:
-            dupTmp = []
-            for en in entries:
-                it = (en.get('year',''), en.get('volume',''),en.get('pages',''))
-                if it==item:
-                    dupTmp.append(en.get('ID'))
-            if len(dupTmp)>1:
-                duplicates.append(dupTmp)
 
-    if len(duplicates):
-        print("The following bib entries may be duplicate. Please check:")
-        for i, item in enumerate(duplicates, start=1):
-            print(f"{i}. {' '.join(item)}")
+    for en in entries:
+        it = tuple(en.get(i,'') for i in keysToMatch)
+        idd = en.get('ID')
+        if checkTex:
+            if idd in cites:  # only references that are cited
+                dat[it].append(en.get('ID'))
+        else:
+            dat[it].append(en.get('ID'))
+
+
+    for k,v in dat.items():
+        if len(v)>1:
+            print(v)
 
 
 # progress = Progress()
