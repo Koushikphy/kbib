@@ -6,6 +6,10 @@
 [![Alt text](https://img.shields.io/pypi/status/kbib.svg)](https://pypi.org/project/kbib/)
 [![Alt text](https://github.com/koushikphy/kbib/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Koushikphy/kbib/releases/latest)
 
+When writing a research article, managing a large number of references to other articles, books, and other sources can be a challenging task. It involves tasks such as copying citations from journal pages, ensuring accuracy and correctness, and avoiding repetitions. This process can be time-consuming and prone to errors.
+
+To address these challenges, I would like to introduce a command-line utility called **`kbib`**. This tool is designed to help researchers manage their references easily and efficiently. With **`kbib`**, you can streamline the process of organizing and formatting citations, saving you valuable time and effort.
+
 
 
 ### ⚡ Features
@@ -13,7 +17,7 @@
 2. Get bibtex information from article pdf.
 3. Get full list of references of an article as a .bib file.
 4. Directly rename pdf files with bibtex information.
-5. Find duplicate bib entries in bibtex files.
+5. Find duplicate bib entries in Tex/Bib files.
 
 ### 🛠️ Installation
 Download and install the latest package from the [release section](https://github.com/Koushikphy/kbib/releases/latest) or directly by pip
