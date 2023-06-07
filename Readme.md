@@ -1,4 +1,4 @@
-## `kbib`: A command line tool to get bibtex information from DOIs and PDFs.
+## `kbib`: The perfect companion for effortless reference management
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypistats.org/packages/kbib)
