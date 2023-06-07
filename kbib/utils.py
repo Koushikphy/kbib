@@ -337,7 +337,7 @@ def listDuplicates(files):
     bib_db = bibtexparser.loads('\n'.join(open(f).read() for f in bibFiles))
     entries = bib_db.entries
 
-    dat = defaultdict(list)
+    dat = defaultdict(set)
     # duplication will be decided based only on these keys
     keysToMatch = ['year','volume','pages']  
 
@@ -347,14 +347,19 @@ def listDuplicates(files):
         idd = en.get('ID')
         if checkTex:
             if idd in cites:  # only references that are cited
-                dat[it].append(en.get('ID'))
+                dat[it].add(en.get('ID'))
         else:
-            dat[it].append(en.get('ID'))
+            dat[it].add(en.get('ID'))
 
 
-    for k,v in dat.items():
-        if len(v)>1:
-            print(v)
+    dupList = [list(v) for _,v in dat.items() if len(v)>1 ]
+    if len(dupList)==0:
+        print('No duplicate reference found.')
+        return
+    print("The following bib entries may be duplicate. Please check:\n")
+    for i,el in enumerate(dupList,start=1):
+        print(f"{i}. {', '.join(el)}")
+
 
 
 # progress = Progress()
