@@ -32,6 +32,13 @@ pip install kbib['pdf']
 
 
 ### 🚀 Usage 
+
+
+
+https://github.com/Koushikphy/kbib/assets/43264301/2a936d59-a784-4770-a0a4-3a950f1916cd
+
+
+
 Use the command line tool `kbib` as 
 ```bash
 kbib [-h] [-bib DOI] [-ref DOI] [-pdf [PDF [PDF ...]]] [-ren [PDF [PDF ...]]] [-dup [BIB [BIB ...]]] [-o DOI]
