@@ -35,7 +35,11 @@ pip install kbib['pdf']
 
 
 
-https://github.com/Koushikphy/kbib/assets/43264301/2a936d59-a784-4770-a0a4-3a950f1916cd
+
+
+https://github.com/Koushikphy/kbib/assets/43264301/50bbcf78-e426-4937-8ebd-a58e424f61bd
+
+
 
 
 
