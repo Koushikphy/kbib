@@ -343,7 +343,11 @@ def listDuplicates(files):
 
 
     for en in entries:
-        it = tuple(en.get(i,'') for i in keysToMatch)
+        it = tuple([
+            en.get('year',''),
+            en.get('volume',''),
+            en.get('pages','').split('-',1)[0]
+            ])
         idd = en.get('ID')
         if checkTex:
             if idd in cites:  # only references that are cited
