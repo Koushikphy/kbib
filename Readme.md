@@ -1,4 +1,4 @@
-## `kbib`: The perfect companion for effortless reference management
+## `kbib`: A tool to get bibtex entries from DOIs or PDFs.
 [![Alt text](https://img.shields.io/pypi/v/kbib.svg?logo=pypi)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/pyversions/kbib.svg?logo=python)](https://pypi.org/project/kbib/)
 [![Alt text](https://img.shields.io/pypi/dm/kbib.svg)](https://pypistats.org/packages/kbib)
@@ -8,7 +8,7 @@
 
 When writing a research article, managing a large number of references to other articles, books, and other sources can be a challenging task. It involves tasks such as copying citations from journal pages, ensuring accuracy and correctness, and avoiding repetitions. This process can be time-consuming and prone to errors.
 
-To address these challenges, I would like to introduce a command-line utility called **`kbib`**. This tool is designed to help researchers manage their references easily and efficiently. With **`kbib`**, you can streamline the process of organizing and formatting citations, saving you valuable time and effort.
+To address these challenges, I have developed a command-line utility called **`kbib`**. This tool is designed to help researchers manage their references easily and efficiently. With **`kbib`**, you can streamline the process of organizing and formatting citations, saving you valuable time and effort.
 
 
 
