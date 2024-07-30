@@ -17,6 +17,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from datetime import timedelta
 from rich import print as rprint
 from collections import Counter, defaultdict
+from jellyfish import damerau_levenshtein_distance as dld
 try:
     import pdf2doi
     PDF_AVAILABLE = True
@@ -35,7 +36,7 @@ class CustomParser(ArgumentParser):
 
 
 
-BARE_API = "http://api.crossref.org/"   # API to get bibtex information 
+BARE_API = "https://api.crossref.org/"   # API to get bibtex information 
 ABVR_API = "https://abbreviso.toolforge.org/abbreviso/a/"  # API to get abbreviated journal name
 DOI_API  = 'https://doi.org/'
 
@@ -48,6 +49,7 @@ progress = Progress(
     TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
     " ETA:",
     TimeRemainingColumn(),
+    # transient=True
 )
 
 
@@ -193,24 +195,34 @@ def reconfigureBibs(bibs):
 def getFullRefList(doi):
     # Get bibtex information for all the references
     found, tRefs = get_all_ref(doi)
-    if found:
-        refDOIs, noDOIs = [], []
-        for r in tRefs:
-            if "DOI" in r:
-                refDOIs.append(r)
-            else:
-                noDOIs.append(r)
 
+    if found:
+        refDOIs, artDOIs, noDOIs = [], [], []
+        with progress:
+            for r in progress.track(tRefs,description='[green bold]Parsing reference list...'):
+                if "DOI" in r:
+                    refDOIs.append(r)
+                elif 'article-title' in r:
+                    artDOIs.append(r)
+                    res= check_again(r['article-title'])
+                    if res:
+                        refDOIs.append(res)
+                    else:
+                        noDOIs.append(r)
+                else:
+                    noDOIs.append(r)
+
+        fullRef = []
         if len(noDOIs):
             rprint(f"[red]DOIs not found for following {len(noDOIs)} references:")
             for r in noDOIs:
                 print(r)
 
-        fullRef = []
-        # for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
         with progress:
+
+        # for ref in tqdm(refDOIs,desc='Parsing bibtex entries from reference list'):
             for ref in progress.track(refDOIs,description='[green bold]Parsing bibtex entries from reference list...'):
-    
+
                 f, refVal = get_bib(ref['DOI'])
                 if f:
                     fullRef.append(refVal)
@@ -219,6 +231,59 @@ def getFullRefList(doi):
         raise Exception("Unable to parse reference list.")
     
 
+
+headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    'Cache-Control': 'max-age=0',
+    'Connection': 'keep-alive',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'cross-site',
+    'Sec-Fetch-User': '?1',
+    'content-type': 'application/json',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+    'sec-ch-ua': '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Linux"',
+}
+
+
+methods = [
+    lambda a,b : a==b,
+    lambda a,b : a in b or b in a,
+    lambda a,b : (dld(a,b)/max(len(a),len(b)))<0.1
+]
+
+def check_again(title):
+    url = "{}works".format(BARE_API)
+    params = {
+        'rows': '5',
+        'query.bibliographic': title,
+    }
+    r = session.get(url, params=params, headers=headers)
+    item = r.json()
+    allItems = item['message']['items'] 
+
+
+    for method in methods:
+        for it in allItems:
+            if 'title' in it:
+                if method(it['title'][0].lower(), title.lower()):
+                    if "DOI" in it:
+                        return it
+                    elif 'URL'in it:
+                        it['DOI'] = it['DOI']
+                        return it
+        
+
+    # print(title)
+    # print('-'*10)
+    # for it in allItems:
+    #     if 'title' in it:
+    #         print(it['title'][0])
+    # print()
 
 
 

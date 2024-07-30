@@ -4,7 +4,7 @@ with open('Readme.md') as f:
     txt = f.read()
 
 setup(name='kbib',
-    version='0.1.10',
+    version='0.2.0',
     description='A command line tool to get bibtex information from DOIs and PDFs',
     long_description=txt,
     long_description_content_type='text/markdown',
@@ -30,6 +30,7 @@ setup(name='kbib',
     install_requires=[
         'bibtexparser>=1.4.0',
         'rich>=12.6.0',
+        'jellyfish>=1.1.0',
         'requests_cache'
     ],
     extras_require = {
